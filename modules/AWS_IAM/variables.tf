@@ -95,6 +95,27 @@ variable "access_analyzer_name" {
   default     = "example-analyzer"
 }
 
+variable "enable_access_analyzer_archive_rule" {
+  description = "Enable IAM Access Analyzer Archive Rule"
+  type        = bool
+  default     = false
+}
+
+variable "access_analyzer_archive_rules" {
+  description = "List of archive rules for Access Analyzer"
+  type = list(object({
+    rule_name = string
+    filter = object({
+      property = string
+      eq       = optional(list(string))
+      neq      = optional(list(string))
+      contains = optional(list(string))
+      exists   = optional(bool)
+    })
+  }))
+  default = []
+}
+
 variable "enable_identity_provider" {
   description = "Enable Identity Provider"
   type        = bool
@@ -129,6 +150,18 @@ variable "existing_iam_users" {
   description = "List of existing IAM users to reference"
   type        = list(string)
   default     = []
+}
+
+variable "environment" {
+  description = "Environment tag for resources"
+  type        = string
+  default     = "development"
+}
+
+variable "project_name" {
+  description = "Project name for tagging purposes"
+  type        = string
+  default     = "example-project"
 }
 
 variable "tags" {

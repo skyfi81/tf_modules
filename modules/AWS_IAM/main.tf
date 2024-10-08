@@ -53,9 +53,23 @@ resource "aws_iam_openid_connect_provider" "oidc_provider" {
 }
 
 # Access Analyzer
-resource "aws_accessanalyzer_analyzer" "access_analyzer" {
+resource "aws_accessanalyzer_analyzer" "main" {
   count         = var.enable_access_analyzer ? 1 : 0
   analyzer_name = var.access_analyzer_name
   type          = "ACCOUNT"
   tags          = var.tags
+}
+
+resource "aws_accessanalyzer_archive_rule" "archive_rule" {
+  count       = var.enable_access_analyzer_archive_rule && var.enable_access_analyzer ? length(var.access_analyzer_archive_rules) : 0
+  analyzer_name = aws_accessanalyzer_analyzer.access_analyzer[count.index].analyzer_name
+  rule_name     = var.access_analyzer_archive_rules[count.index].rule_name
+
+  filter {
+    property = var.access_analyzer_archive_rules[count.index].filter.property
+    eq       = var.access_analyzer_archive_rules[count.index].filter.eq
+    neq      = var.access_analyzer_archive_rules[count.index].filter.neq
+    contains = var.access_analyzer_archive_rules[count.index].filter.contains
+    exists   = var.access_analyzer_archive_rules[count.index].filter.exists
+  }
 }
